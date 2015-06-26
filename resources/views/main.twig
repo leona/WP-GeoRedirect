@@ -1,0 +1,138 @@
+<h1>GeoRedirect rules</h1>
+
+{% if return_msg == true %}
+    <div id="setting-error-settings_updated" class="updated settings-error notice is-dismissible"> 
+    <p><strong>Succesfully saved.</strong></p></div>
+{% endif %}
+
+<hr>
+<h3>Add mass redirect rule</h3>
+
+<form action="{{ action_url }}" method="POST">
+    <input type="hidden" name="request_type" value="mass">
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+
+    <table class="widefat importers striped">
+        <tr>
+            <td>Country</td>
+            <td>Redirect to URL</td>
+            <td>Redirect first visit only</td>
+            <td>Action</td>
+        </tr>
+        <tr>
+            <td>
+                <select name="country">
+                    {% for code, name in countries %}
+                    <option value="{{ code }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <input type="text" name="redirect_url" placeholder="/sample-post">
+            </td>
+            <td>
+                <input name="force_redirect" type="checkbox">
+            </td>
+            <td>
+                <input type="submit" class="button button-primary" value="Add">
+            </td>
+        </tr>
+    </table>
+</form>
+<hr>
+
+<h3>Add redirect from URL/Post/Category</h3>
+<p class="description" id="tagline-description">Please select a <strong>single</strong> target to prevent entering the nether.</p>
+<form action="{{ action_url }}" method="POST">
+    <input type="hidden" name="request_type" value="specific">
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+
+    <table class="widefat importers striped">
+        <tr>
+            <td>Country</td>
+            <td>Target URL</td>
+            <td>Target post</td>
+            <td>Target category</td>
+        </tr>
+        <tr>
+            <td>
+                <select name="country">
+                    {% for code, name in countries %}
+                    <option value="{{ code }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <input name="target[url]" type="text" placeholder="/sample-post">
+            </td>
+            <td>
+                <select name="target[post]">
+                    <option value="">- -</option>
+                    {% for post in posts %}
+                    <option value="{{ post.ID }}">{{ post.post_title }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <select name="target[category]">
+                    <option value="">- -</option>
+                    {% for category in categories %}
+                    <option value="{{ category.cat_ID }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Redirect to URL</td>
+            <td>Redirect first visit only</td>
+            <td>Action</td>
+        </tr>
+        <tr>
+            <td>
+                <input name="redirect_url" type="text" placeholder="/america">
+            </td>
+            <td>
+                <input name="force_redirect" type="checkbox">
+            </td>
+            <td>
+                <input type="submit" class="button button-primary" value="Add">
+            </td>
+        </tr>
+    </table>
+</form>
+
+
+{% if current_rules is not empty %}
+
+<hr>
+<h3>Current rules</h3>
+
+<form action="{{ action_url }}" method="POST">
+    <input type="hidden" name="request_type" value="current">
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+
+    <table class="widefat importers striped">
+        <tr>
+            <td>Country</td>
+            <td>Target</td>
+            <td>Redirect</td>
+            <td>First visit only</td>
+            <td>Delete</td>
+        </tr>
+        {% for rule in current_rules %}
+        <tr>
+            <td>{{ attribute(countries, rule.country) }}</td>
+            <td>{{ rule.target|default('*')|e }}</td>
+            <td>{{ rule.redirect_url|e }}</td>
+            <td>{{ rule.force_redirect ? 'No':'Yes' }}</td>
+            <td>
+                <input type="checkbox" name="delete[{{ rule.id }}]">
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <input type="submit" value="Delete" class="button button-primary">
+</form>
+
+{% endif %}
